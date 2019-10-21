@@ -1,26 +1,11 @@
 package com.faverolles;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-enum Esp {
-    READ {
-        public String toString() {
-            return "writeESPSerial.py";
-        }
-    },
-    WRITE {
-        public String toString() {
-            return "readESPSerial.py";
-        }
-    },
-    TEST {
-        public String toString() {
-            return "python -c 'import IoTLogic; print IoTLogic.pycon_test_function()'";
-        }
-    },
-}
 
 class PyCon {
 
@@ -33,6 +18,7 @@ class PyCon {
      */
     static void readEsp(){
         String command = "python ".concat(commandPrefix).concat("readESPSerial.py");
+        execute(command);
     }
 
     /**
@@ -41,6 +27,7 @@ class PyCon {
      */
     static void writeEsp(String text){
         String command = "python ".concat(commandPrefix).concat("writeESPSerial.py -n ").concat(text);
+        execute(command);
     }
 
     /**
@@ -49,29 +36,48 @@ class PyCon {
     static void testEsp(){
         String command = "python -c 'import ".concat(iotLogicPath)
                 .concat("; print ").concat(iotLogicPath).concat(".pycon_test_function()'");
+        execute(command);
     }
 
     /**
-     *
+     * python -c 'import IoTLogic; print IoTLogic.scan_wifi()'
      */
     static void scanWifi(){
-        String command = getIoTLogicFunctionPath("scanWifi");
+        String command = getIoTLogicFunctionPath("scan_wifi");
+        execute(command);
     }
 
 
+    /**
+     * python -c 'import IoTLogic; print IoTLogic.functionName'
+     * @param functionName Function in IoTLogic to call.
+     *                     Can pass just the functionName or functionName()
+     */
+    static void ioTLogic(String functionName) {
+        String command = getIoTLogicFunctionPath(functionName);
+        execute(command);
+    }
+
+    /**
+     * Utility method to build the function path call within IoTLogic.py
+     * @param name Function in IoTLogic to call.
+     *             Can pass just the functionName or functionName()
+     * @return python call path String
+     */
     private static String getIoTLogicFunctionPath(String name){
         String callName = !name.contains("()") ? name.concat("()") : name;
         return "python -c 'import ".concat(iotLogicPath)
                 .concat("; print ").concat(iotLogicPath).concat(callName);
     }
 
-    static void callIoTLogic(Esp esp) {
+    /**
+     * Execute python package iotpy using java Runtime exec()
+     * @param command python command
+     */
+    private static void execute(String command) {
         String result = null;
         try {
-            Path relPath = Paths.get("itopy");
-            String absPath = relPath.toAbsolutePath().toString();
-            System.out.println(absPath);
-            /*Process p = Runtime.getRuntime().exec("asdf");
+            Process p = Runtime.getRuntime().exec(command);
             BufferedReader stdIn = new BufferedReader(new InputStreamReader(p.getInputStream()));
             BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
@@ -81,9 +87,9 @@ class PyCon {
             }
 
             System.out.println("PyCon Command Errors: ");
-            while ((result = stdIn.readLine()) != null) {
+            while ((result = stdErr.readLine()) != null) {
                 System.out.println(result);
-            }*/
+            }
         } catch (Exception e) {
             System.out.println("EXCEPTION Class[PyCon] Method[execute]\n" + e);
         }
