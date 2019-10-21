@@ -3,7 +3,6 @@ import time
 from subprocess import Popen, PIPE
 
 from wifi import Cell
-
 print(list(Cell.all('wlan0')))
 
 s = time.time()
@@ -28,3 +27,4 @@ def scan_wifi():
         if(i % 5) == 0:
             ssid_lst.append(lst[i])
     print(ssid_lst)
+
