@@ -24,26 +24,48 @@ enum Esp {
 
 class PyCon {
 
-    private static String commandPrefix = Paths.get("itopy").toAbsolutePath().toString();
+    private static String commandPrefix
+            = Paths.get("itopy").toAbsolutePath().toString().concat(File.separator);
+    private static String iotLogicPath = commandPrefix.concat("IoTLogic");
 
-
+    /**
+     * python readESPSerial.py
+     */
     static void readEsp(){
-        String command = "python ".concat(commandPrefix).concat(File.separator).concat("readESPSerial.py");
+        String command = "python ".concat(commandPrefix).concat("readESPSerial.py");
     }
 
-    static void writeEsp(){
-
+    /**
+     * python writeESPSerial.py -n text
+     * @param text New Text for ESP SSID
+     */
+    static void writeEsp(String text){
+        String command = "python ".concat(commandPrefix).concat("writeESPSerial.py -n ").concat(text);
     }
 
+    /**
+     * python -c 'import IoTLogic; print IoTLogic.pycon_test_function()'
+     */
     static void testEsp(){
-
+        String command = "python -c 'import ".concat(iotLogicPath)
+                .concat("; print ").concat(iotLogicPath).concat(".pycon_test_function()'");
     }
 
+    /**
+     *
+     */
     static void scanWifi(){
-
+        String command = getIoTLogicFunctionPath("scanWifi");
     }
 
-    static void execute(Esp esp) {
+
+    private static String getIoTLogicFunctionPath(String name){
+        String callName = !name.contains("()") ? name.concat("()") : name;
+        return "python -c 'import ".concat(iotLogicPath)
+                .concat("; print ").concat(iotLogicPath).concat(callName);
+    }
+
+    static void callIoTLogic(Esp esp) {
         String result = null;
         try {
             Path relPath = Paths.get("itopy");
