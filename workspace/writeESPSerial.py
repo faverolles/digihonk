@@ -1,16 +1,15 @@
 import sys
-from argparse import ArgumentParser
-from os import walk
-import subprocess
 
 import serial
+from os import walk
+from argparse import ArgumentParser
 
 
-def get_device(defL="/dev/"):
-    for rool, dirs, files in walk(defL):
+def get_device(path="/dev/"):
+    for rool, dirs, files in walk(path):
         for file in files:
             if 'ttyUSB' in file:
-                picon = defL + file
+                picon = path + file
 
     try:
         picon
@@ -26,11 +25,12 @@ if __name__ == '__main__':
     parser.add_argument('-n', dest='SSID', action='store', help='Get new SSID', default='newSSID')
     results = parser.parse_args()
 
-    if sys.platform.startswith('linux'):
-        espwrite = serial.Serial(get_device(), 115200)
-        espwrite.write(results.SSID.encode())
+    if sys.platform.startswith('win'):
+        port = 'COM3'
+        espwrite = serial.Serial(port, 115200)
+        print(f'Is COM3 Open? {espwrite.is_open()}')
         espwrite.close()
-    elif sys.platform.startswith('win'):
-        espwrite = serial.Serial('COM3', 115200)
+    elif sys.platform.startswith('linux'):
+        espwrite = serial.Serial(get_device(), 115200)
         espwrite.write(results.SSID.encode())
         espwrite.close()

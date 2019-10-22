@@ -1,3 +1,4 @@
+import re
 import subprocess
 
 
@@ -7,11 +8,15 @@ def scan_wifi():
     res = res.replace("\r", "")
     lst = res.split("\n")
     lst = lst[4:]
-    ssid_lst = []
-    for i in lst:
-        if (i % 5) == 0:
-            ssid_lst.append(lst[i])
-    print(ssid_lst)
+
+    ssid_lst_x = filter(lambda lmb_x: "DGHonk" in lmb_x, lst)
+    # ssid_lst_x = filter(lambda lmb_x: "SSID" in lmb_x, lst)
+
+    ssid_lst_y = list(ssid_lst_x)
+    for i in ssid_lst_y:
+        tmp = re.sub('SSID [0-9]* : ', '', i)
+        if not tmp == "":
+            print(tmp)
 
 
 if __name__ == '__main__':
