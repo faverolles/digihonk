@@ -3,6 +3,7 @@ import subprocess
 
 
 def scan_wifi():
+    
     res = subprocess.check_output(["netsh", "wlan", "show", "network"])
     res = res.decode("ascii")
     res = res.replace("\r", "")

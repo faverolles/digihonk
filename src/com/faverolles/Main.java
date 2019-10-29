@@ -1,3 +1,5 @@
+// TODO(faverolles): Update documentation comments
+
 package com.faverolles;
 
 import java.util.*;
@@ -16,7 +18,6 @@ public class Main {
 
 
     public static void main(String[] args) {
-
         Scanner scn = new Scanner(System.in);
         boolean runModeContinuous = false;
         int counter = 1;
@@ -46,8 +47,14 @@ public class Main {
     }
 }
 
+/***
+ * This task is passed as an argument to a Thread() constructor
+ * While this thread is running it will continuously sort {@code detectedSignalsList}
+ * This task provides methods to access the sorted list
+ *
+ * @author faverolles
+ */
 class SortWifiTask implements Runnable {
-
     private static List<String> detectedSignalsList = new ArrayList<>();
     private static boolean stop = false;
 
@@ -93,7 +100,6 @@ class SortWifiTask implements Runnable {
         String smallest;
         Main.lock.lock();
         try {
-            smallest = SortWifiTask.detectedSignalsList.get(0);
             smallest = String.valueOf(SortWifiTask.detectedSignalsList.stream().min(String::compareTo));
         } catch (Exception e) {
             System.out.println("No signals to return from sorting");
@@ -104,6 +110,19 @@ class SortWifiTask implements Runnable {
     }
 }
 
+
+/**
+ * This task is passed as an argument to a Thread() constructor
+ * This thread can run in two modes.
+ * In {@code runModeContinuous = false} the {@code Ticker} utility class will be used to count down ten seconds.
+ * In {@code runModeContinuous = true} this task will run until {@code Main.myTimeStamp} equals
+ *      the minimum value returned from {@code SortWifiTask}.
+ *
+ * This class uses {@code PyCon.scanWifi.py} to get a list of available "DGhonk" WiFi signals.
+ *      It then passes this list of detected signals to {@code SortWifiTask} so they can be sorted.
+ *
+ * @author faverolles
+ */
 class ScanWifiTask extends TimerTask implements Runnable {
     private Ticker ticker;
     private Timer timer;
@@ -123,7 +142,7 @@ class ScanWifiTask extends TimerTask implements Runnable {
         Map<String, List<String>> map = PyCon.scanWifi();
         PyCon.print(map);
 
-        // faverolles 10/29/2019 [A]: check if there is a possibility for map.get("out") to be null
+        // TODO(faverolles): check if there is a possibility for map.get("out") to be null
         //  it wont matter if it is an empty list. It just cant be null
         try {
             List<String> results = map.get("out").stream().map(e ->
