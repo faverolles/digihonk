@@ -5,7 +5,7 @@ import serial
 def pycon_test_function():
     print("It Works")
     if sys.platform.startswith('win'):
-        port = 'COM3'
+        port = 'COM5'
         espwrite = serial.Serial(port, 115200)
         print(f'Is COM3 Open? {espwrite.is_open}')
         espwrite.close()

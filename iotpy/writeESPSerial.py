@@ -31,6 +31,6 @@ if __name__ == '__main__':
         espwrite.write(results.SSID.encode())
         espwrite.close()
     elif sys.platform.startswith('win'):
-        espwrite = serial.Serial('COM3', 115200)
+        espwrite = serial.Serial('COM5', 115200)
         espwrite.write(results.SSID.encode())
         espwrite.close()
