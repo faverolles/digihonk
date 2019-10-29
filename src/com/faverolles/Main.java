@@ -12,15 +12,27 @@ public class Main {
 
     static final ReentrantLock lock = new ReentrantLock();
 
+    static String myTimeStamp = "9999999999999999999999999999999999999";
+
+
     public static void main(String[] args) {
 
         Scanner scn = new Scanner(System.in);
-//        System.out.println("Press Enter To Start");
-//        scn.nextLine();
+        boolean runModeContinuous = false;
+        int counter = 1;
+        while (counter > 0) {
+            System.out.println("Run Mode Continuous (y/n)");
+            String input = scn.nextLine();
+            if (input.equals("n") || input.equals("y")) {
+                runModeContinuous = !input.equals("n");
+                break;
+            }
+            counter--;
+        }
 
-        String timeStamp = String.valueOf(System.currentTimeMillis());
-        System.out.println("Writing TimeStamp To ESP: " + timeStamp);
-        PyCon.print(PyCon.writeEsp(timeStamp));
+        myTimeStamp = String.valueOf(System.currentTimeMillis());
+        System.out.println("Writing TimeStamp To ESP: " + myTimeStamp);
+        PyCon.print(PyCon.writeEsp(myTimeStamp));
 
         SortWifiTask sortWifiTask = new SortWifiTask();
         Thread sortThread = new Thread(sortWifiTask);
@@ -29,7 +41,7 @@ public class Main {
         System.out.println("Starting Ticker");
         Timer timer = new Timer();
         Ticker ticker = new Ticker(TICK_COUNT);
-        timer.scheduleAtFixedRate(new ScanWifiTask(timer, ticker), delay, period);
+        timer.scheduleAtFixedRate(new ScanWifiTask(timer, ticker, runModeContinuous), delay, period);
 
     }
 }
@@ -39,8 +51,7 @@ class SortWifiTask implements Runnable {
     private static List<String> detectedSignalsList = new ArrayList<>();
     private static boolean stop = false;
 
-    SortWifiTask() {
-    }
+    SortWifiTask() { }
 
     @Override
     public void run() {
@@ -75,15 +86,31 @@ class SortWifiTask implements Runnable {
         stop = true;
         Main.lock.unlock();
     }
+
+    static String getMin() {
+        String smallest;
+        Main.lock.lock();
+        try {
+            smallest = SortWifiTask.detectedSignalsList.get(0);
+            smallest = String.valueOf(SortWifiTask.detectedSignalsList.stream().min(String::compareTo));
+        }catch (Exception e){
+            System.out.println("No signals to return from sorting");
+            smallest = "-1";
+        }
+        Main.lock.unlock();
+        return smallest;
+    }
 }
 
 class ScanWifiTask extends TimerTask implements Runnable {
     private Ticker ticker;
     private Timer timer;
+    private boolean runModeContinuous;
 
-    ScanWifiTask(Timer timer, Ticker ticker) {
+    ScanWifiTask(Timer timer, Ticker ticker, boolean runModeContinuous) {
         this.ticker = ticker;
         this.timer = timer;
+        this.runModeContinuous = runModeContinuous;
     }
 
     @Override
@@ -106,11 +133,18 @@ class ScanWifiTask extends TimerTask implements Runnable {
             System.out.println("EXCEPTION: ScanWifiTask.run() Error cleaning list");
             System.out.println(e.toString());
         }
-
-        if (this.ticker.ticks >= this.ticker.stop) {
-            this.timer.cancel();
-            SortWifiTask.stopSorting();
-            System.out.println("Waiting period after car stops is finished");
+        if (!runModeContinuous) {
+            if (this.ticker.ticks >= this.ticker.stop) {
+                this.timer.cancel();
+                SortWifiTask.stopSorting();
+                System.out.println("Waiting period after car stops is finished");
+            }
+        } else {
+            if(Main.myTimeStamp.equals(SortWifiTask.getMin())){
+                this.timer.cancel();
+                SortWifiTask.stopSorting();
+                System.out.println("It's my turn. Stopping algorithm");
+            }
         }
     }
 }
