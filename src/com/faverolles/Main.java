@@ -51,7 +51,8 @@ class SortWifiTask implements Runnable {
     private static List<String> detectedSignalsList = new ArrayList<>();
     private static boolean stop = false;
 
-    SortWifiTask() { }
+    SortWifiTask() {
+    }
 
     @Override
     public void run() {
@@ -87,13 +88,14 @@ class SortWifiTask implements Runnable {
         Main.lock.unlock();
     }
 
+
     static String getMin() {
         String smallest;
         Main.lock.lock();
         try {
             smallest = SortWifiTask.detectedSignalsList.get(0);
             smallest = String.valueOf(SortWifiTask.detectedSignalsList.stream().min(String::compareTo));
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("No signals to return from sorting");
             smallest = "-1";
         }
@@ -140,7 +142,7 @@ class ScanWifiTask extends TimerTask implements Runnable {
                 System.out.println("Waiting period after car stops is finished");
             }
         } else {
-            if(Main.myTimeStamp.equals(SortWifiTask.getMin())){
+            if (Main.myTimeStamp.equals(SortWifiTask.getMin())) {
                 this.timer.cancel();
                 SortWifiTask.stopSorting();
                 System.out.println("It's my turn. Stopping algorithm");
