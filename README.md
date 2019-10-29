@@ -12,3 +12,15 @@ in a connectionless way using the pre-existing WiFi standard.
 
 ## TODO
 The list of tasks left to complete can be found [here](TODO.md).
+
+## Packages
+* `iotpy`
+    * Writes timestamps to the ESP for it to broadcast
+    * Scans the available WiFi signals
+    * Reads from the ESP
+* `com.faverolles`
+    * Interfaces with the python package
+        * Provides API to call python scripts within `iotpy`
+    * Logic what happens when the vehicle comes to a stop at a four way stop
+    * Logic to sort the list of available _`DGhonk-timestamp`_ signals
+    * Logic for a vehicle to wait it's turn based on first stop arrival time.
