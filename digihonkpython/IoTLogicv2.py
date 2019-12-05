@@ -1,8 +1,9 @@
-from random import randint
-import ESPSerial
-from time import time, sleep
 import re
-import IoTServer
+from random import randint
+from time import time, sleep
+
+import ESPSerial
+from IoTServer import IoTServer
 
 app_server = None
 
@@ -130,8 +131,10 @@ def mode4_immoving():
         rtype: None
     """
     new_broadcast(mode='4', next_move=MYID, flush=False)
+    app_server.send('go')
     sleep(5)
     new_broadcast(mode='6', flush=False)
+
 
 
 def mode5_monitornexttomove(go_after):
@@ -216,6 +219,19 @@ honk_list = ['1||DGHonk-1.1.1256489.1..---||11||-52||18:9C:27:34:42:60',
 
 if __name__ == '__main__':
     app_server = IoTServer()
+    app_server.send('wait')
+
+    while True:
+        try:
+            turn_direction_str = app_server.recv()
+            if turn_direction_str is not None:
+                my_direction = int(turn_direction_str)
+                print(f'--> My Turning Direction [{my_direction}]')
+                break
+        except:
+            my_direction = None
+            print('--> Could Not Parse Turning Direction [Bad Data]')
+
     # MYID = get_MYID().strip()
     new_broadcast(mode='1', flush=False)
     while True:

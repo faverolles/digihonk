@@ -1,11 +1,11 @@
 import socket
 
 
-class IoTServer:
+class IoTServer(object):
     connection = None
     server_socket = None
 
-    def __init__(self) -> None:
+    def __init__(self):
         try:
             port = 65432
             listen_address = '0.0.0.0'
@@ -37,13 +37,20 @@ class IoTServer:
         print(f'--> Sending Data [{data}]')
         self.connection.sendall(bytes(data, 'utf-8'))
 
-    def recv(self):
+    def recv(self) -> str:
         print('--> Listening For Data')
-        data = self.connection.recv(1024)
+        data = None
+        try:
+            data = self.connection.recv(1024)
+            data = data.decode("utf-8")
+        except:
+            data = None
+
         if not data:
             print(f'--> Received Bad Data')
         else:
             print(f'--> Received [{data}]')
+        return data
 
 
 if __name__ == '__main__':
