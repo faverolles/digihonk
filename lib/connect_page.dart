@@ -16,12 +16,17 @@ class _ConnectPageState extends State<ConnectPage> {
   TextEditingController _ipTxtCtrl = TextEditingController();
   var _enableConnectBtn = false;
   var _titleText = "DGHonk";
+  var rgex = RegExp(
+    r"^(([0-9]{1,4})\.){3}([0-9]{1,4})$",
+    caseSensitive: false,
+    multiLine: false,
+  );
 
   @override
   void initState() {
     super.initState();
     this._ipTxtCtrl.addListener(this._checkEnableConnectBtn);
-    this._ipTxtCtrl.text = "192.168.1.15";
+    this._ipTxtCtrl.text = "10.205.3.168";
   }
 
   Future<void> _onConnectBtnPress() async {
@@ -29,8 +34,8 @@ class _ConnectPageState extends State<ConnectPage> {
   }
 
   void _checkEnableConnectBtn() {
-    var ip = this._ipTxtCtrl.text;
-    if (ip.length > 0 && ip.contains(".")) {
+    if (this.rgex.hasMatch(this._ipTxtCtrl.text)) {
+      print(this.rgex.hasMatch(this._ipTxtCtrl.text));
       setState(() {
         this._enableConnectBtn = true;
       });

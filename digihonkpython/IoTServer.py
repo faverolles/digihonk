@@ -35,7 +35,8 @@ class IoTServer(object):
 
     def send(self, data: str) -> None:
         print(f'--> Sending Data [{data}]')
-        self.connection.sendall(bytes(data, 'utf-8'))
+        # self.connection.sendall(bytes(data, 'utf-8'))
+        self.connection.send(bytes(data, 'utf-8'))
 
     def recv(self) -> str:
         print('--> Listening For Data')
@@ -53,10 +54,10 @@ class IoTServer(object):
         return data
 
 
-if __name__ == '__main__':
-    server = IoTServer()
-    server.recv()
-    server.send("Hello")
+# if __name__ == '__main__':
+#     server = IoTServer()
+#     server.recv()
+#     server.send("Hello")
 
 # for i in range(0, 100):
 #     data = f'From Server {i}'

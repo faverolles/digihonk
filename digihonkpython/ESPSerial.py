@@ -119,8 +119,8 @@ class ESPConnect:
             return None
 
 
-commPort = "COM23"
-
+# commPort = "COM23"
+commPort = "COM3"
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('-n', dest='SSID', action='store', help='Get new SSID', default='0:newSSID')
